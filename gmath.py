@@ -4,13 +4,13 @@ from display import *
 
   # IMPORANT NOTE
 
-  # Ambient light is represeneted by a color value
+  # Ambient light is represented by a color value
 
   # Point light sources are 2D arrays of doubles.
   #      - The fist index (LOCATION) represents the vector to the light.
   #      - The second index (COLOR) represents the color.
 
-  # Reflection constants (ka, kd, ks) are represened as arrays of
+  # Reflection constants (ka, kd, ks) are represented as arrays of
   # doubles (red, green, blue)
 
 AMBIENT = 0
