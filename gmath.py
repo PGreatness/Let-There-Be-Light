@@ -22,19 +22,51 @@ SPECULAR_EXP = 4
 
 #lighting functions
 def get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect ):
-    pass
+    amb = calculate_ambient(ambient, areflect)
+    diff = calculate_diffuse(light, dreflect, normal)
+    spec = calculate_specular(light, sreflect, view, normal)
+    color = add_all(amb, diff, spec)
+    limit_color(color)
+    return color
 
 def calculate_ambient(alight, areflect):
-    pass
+    return [ alight[x] * areflect[x] for x in range(len(alight)) ]
 
 def calculate_diffuse(light, dreflect, normal):
-    pass
+    loc = light[0]
+    col = light[1]
+    normalize(loc)
+    normalize(normal)
+    loc_normal= dot_product(loc, normal)
+    return [ dreflect[x] * col[x] * loc_normal for x in range(len(dreflect)) ]
 
 def calculate_specular(light, sreflect, view, normal):
-    pass
+    loc = light[0]
+    col = light[1]
+    normalize(loc)
+    normalize(normal)
+    normalize(view)
+    w = 2 * dot_product(loc, normal)
+    dis = [ w * x for x in normal ]
+    sub = [ dis[x] - loc[x] for x in range(len(dis)) ]
+    norm = dot_product(sub, view)
+    norm = (math.pow(abs(norm), SPECULAR_EXP)) * norm / abs(norm)
+    return [ sreflect[x] * col[x] * norm for x in range(len(sreflect)) ]
 
 def limit_color(color):
-    pass
+    for x in range(len(color)):
+      curr = color[x]
+      color[x] = curr if curr <= 255 and curr > 0 else 255 if curr > 255 else 0
+    return color
+
+def add_all(*args):
+  sumList = []
+  for x in range(len(args[0])):
+    currSum = 0
+    for i in range(len(args)):
+      currSum += args[i][x]
+  sumList.append(currSum)
+  return sumList
 
 #vector functions
 #normalize vetor, should modify the parameter
