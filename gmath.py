@@ -1,16 +1,15 @@
 import math
 from display import *
 
-
   # IMPORANT NOTE
 
-  # Ambient light is represented by a color value
+  # Ambient light is represeneted by a color value
 
   # Point light sources are 2D arrays of doubles.
   #      - The fist index (LOCATION) represents the vector to the light.
   #      - The second index (COLOR) represents the color.
 
-  # Reflection constants (ka, kd, ks) are represented as arrays of
+  # Reflection constants (ka, kd, ks) are represened as arrays of
   # doubles (red, green, blue)
 
 AMBIENT = 0
@@ -18,55 +17,58 @@ DIFFUSE = 1
 SPECULAR = 2
 LOCATION = 0
 COLOR = 1
-SPECULAR_EXP = 4
+SPECULAR_EXP = 2
 
 #lighting functions
 def get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect ):
-    amb = calculate_ambient(ambient, areflect)
-    diff = calculate_diffuse(light, dreflect, normal)
-    spec = calculate_specular(light, sreflect, view, normal)
-    color = add_all(amb, diff, spec)
+    amb = calculate_ambient(ambient,areflect)
+    diff = calculate_diffuse(light,dreflect,normal)
+    spec = calculate_specular(light,sreflect,view,normal)
+
+    def sum(*args):
+      totalSum = []
+      for x in range(len(args[0])):
+          currSum = 0
+          for i in range(len(args)):
+              currSum += args[i][x]
+          totalSum.append(currSum)
+      return totalSum
+
+    color = sum(amb,diff,spec)
     limit_color(color)
     return color
 
 def calculate_ambient(alight, areflect):
-    return [ alight[x] * areflect[x] for x in range(len(alight)) ]
+    return [alight[x] * areflect[x] for x in range(len(alight))]
 
 def calculate_diffuse(light, dreflect, normal):
-    loc = light[0]
-    col = light[1]
+    loc, col = light
     normalize(loc)
     normalize(normal)
-    loc_normal= dot_product(loc, normal)
-    return [ dreflect[x] * col[x] * loc_normal for x in range(len(dreflect)) ]
+    norm = dot_product(loc, normal)
+    return [dreflect[x] * col[x] * norm for x in range(len(dreflect))]
 
 def calculate_specular(light, sreflect, view, normal):
-    loc = light[0]
-    col = light[1]
+    loc, col = light
     normalize(loc)
     normalize(normal)
     normalize(view)
-    w = 2 * dot_product(loc, normal)
-    dis = [ w * x for x in normal ]
-    sub = [ dis[x] - loc[x] for x in range(len(dis)) ]
-    norm = dot_product(sub, view)
-    norm = (math.pow(abs(norm), SPECULAR_EXP)) * norm / abs(norm)
-    return [ sreflect[x] * col[x] * norm for x in range(len(sreflect)) ]
+
+    def subtract(a, b):
+      return [a[x] - b[x] for x in range(len(a))]
+    def distribute(a, b):
+      return [a * x for x in b]
+
+    norm = dot_product(subtract(distribute(2 * dot_product(loc, normal),normal), loc), view)
+    norm = math.pow(abs(norm), SPECULAR_EXP) * norm / abs(norm)
+
+    return [sreflect[x] * col[x] * norm for x in range(len(sreflect))]
 
 def limit_color(color):
-    for x in range(len(color)):
-      curr = color[x]
-      color[x] = curr if curr <= 255 and curr > 0 else 255 if curr > 255 else 0
+    for i in range(len(color)):
+        a = color[i]
+        color[i] = a if a <= 255 and a > 0 else 255 if a > 255 else 0
     return color
-
-def add_all(*args):
-  sumList = []
-  for x in range(len(args[0])):
-    currSum = 0
-    for i in range(len(args)):
-      currSum += args[i][x]
-  sumList.append(currSum)
-  return sumList
 
 #vector functions
 #normalize vetor, should modify the parameter
