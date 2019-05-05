@@ -88,8 +88,8 @@ def draw_polygons( polygons, screen, zbuffer, view, ambient, light, areflect, dr
 
         #print normal
         if normal[2] > 0:
-
             color = get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect )
+            color = [int(x) for x in color]
             scanline_convert(polygons, point, screen, zbuffer, color)
 
             # draw_line( int(polygons[point][0]),

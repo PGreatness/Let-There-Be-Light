@@ -25,7 +25,7 @@ def get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect ):
     diff = calculate_diffuse(light,dreflect,normal)
     spec = calculate_specular(light,sreflect,view,normal)
 
-    def sum(*args):
+    def add_all(*args):
       totalSum = []
       for x in range(len(args[0])):
           currSum = 0
@@ -34,19 +34,19 @@ def get_lighting(normal, view, ambient, light, areflect, dreflect, sreflect ):
           totalSum.append(currSum)
       return totalSum
 
-    color = sum(amb,diff,spec)
+    color = add_all(amb,diff,spec)
     limit_color(color)
     return color
 
 def calculate_ambient(alight, areflect):
-    return [alight[x] * areflect[x] for x in range(len(alight))]
+    return [ alight[x] * areflect[x] for x in range(len(alight)) ]
 
 def calculate_diffuse(light, dreflect, normal):
     loc, col = light
     normalize(loc)
     normalize(normal)
     norm = dot_product(loc, normal)
-    return [dreflect[x] * col[x] * norm for x in range(len(dreflect))]
+    return [ dreflect[x] * col[x] * norm for x in range(len(dreflect)) ]
 
 def calculate_specular(light, sreflect, view, normal):
     loc, col = light
@@ -54,14 +54,14 @@ def calculate_specular(light, sreflect, view, normal):
     normalize(normal)
     normalize(view)
 
-    def subtract(a, b):
-      return [a[x] - b[x] for x in range(len(a))]
+    def subtract(a,b):
+      return [ a[x] - b[x] for x in range(len(a)) ]
     def distribute(a, b):
-      return [a * x for x in b]
+      return [ a * x for x in b ]
 
-    norm = dot_product(subtract(distribute(2 * dot_product(loc, normal),normal), loc), view)
-    norm = math.pow(abs(norm), SPECULAR_EXP) * norm / abs(norm)
-
+    w = 2 * dot_product(loc, normal)
+    norm = dot_product(subtract(distribute(w, normal), loc), view)
+    norm = math.pow(abs(norm), SPECULAR_EXP) * norm / abs(norm) 
     return [sreflect[x] * col[x] * norm for x in range(len(sreflect))]
 
 def limit_color(color):

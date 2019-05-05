@@ -8,16 +8,16 @@ import math
 # lighting values
 view = [0,
         0,
-        1]
+        1];
 ambient = [50,
            50,
            50]
 light = [[0.5,
           0.75,
           1],
-         [0,
-          255,
-          255]]
+         [66,
+          244,
+          69]]
 areflect = [0.1,
             0.1,
             0.1]
